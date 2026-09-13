@@ -377,7 +377,7 @@ a{text-decoration:none;color:inherit}
 .banana{
   position:relative;
   background:#d9d7d2;              /* 与首屏封面同款纸灰底 */
-  color:#141414;padding:84px 0 110px;
+  color:#141414;padding:84px 0 205px;
 }
 .b-slug{
   font-family:var(--body);font-weight:900;
@@ -423,16 +423,17 @@ a{text-decoration:none;color:inherit}
   margin-top:64px;
 }
 .fall-zone{
-  --ey:1140px;                   /* 终点纵向：区高 + 出界余量（窄屏由媒体查询覆盖） */
+  --ey:900px;                    /* 终点纵向：区高 + 出界余量（窄屏由媒体查询覆盖） */
   position:relative;
-  height:880px;
+  height:640px;
   overflow:hidden;
 }
 /* 电线杆贴图层：位置由滚动进度驱动（--pole-y 由 JS 写入）
-   默认 112% = 整个藏在区块底外，滚进来才一点点爬上来；最高点封顶在 0 */
+   默认 112% = 整个藏在区块底外，滚进来才一点点爬上来；最高点封顶在 0
+   跑道收短后，杆底往下补 240px——杆的绝对位置与大小维持不变 */
 .pole-img{
-  position:absolute;left:50%;bottom:0;z-index:0;
-  height:120%;width:auto;
+  position:absolute;left:50%;bottom:-240px;z-index:0;
+  height:1056px;width:auto;
   transform:translate(-50%,var(--pole-y,112%));
   will-change:transform;
   pointer-events:none;
@@ -670,8 +671,10 @@ a{text-decoration:none;color:inherit}
   .shop-head{flex-direction:column;gap:20px}
   .shop-side{max-width:100%}
   .banana .shop-side .ip-intro{font-size:14px}
-  /* 窄屏：下落区收矮，终点纵深同步缩短 */
+  /* 窄屏：下落区收矮，终点纵深同步缩短；杆沿用原比例原位置，底距回到原值 */
   .fall-zone{height:640px;--ey:960px}
+  .pole-img{height:768px;bottom:0}
+  .banana{padding-bottom:110px}
   /* 窄屏：提示文字挪到电视下方居中，箭头收起 */
   .tv-hint{right:auto;left:50%;bottom:-34px;transform:translateX(-50%)}
   .tv-hint-arrow{display:none}
@@ -682,6 +685,7 @@ a{text-decoration:none;color:inherit}
   .nav-in{height:62px}
   .login{padding:8px 14px}
   .fall-zone{height:480px;--ey:780px}
+  .pole-img{height:576px;bottom:0}
   .cm-stage img{max-width:88vw}
   .cm-close{top:14px;right:14px}
   .merch{margin-top:-110px;padding:190px 20px 90px}
