@@ -674,7 +674,8 @@ a{text-decoration:none;color:inherit}
   /* 窄屏：下落区收矮，终点纵深同步缩短；杆沿用原比例原位置，底距回到原值 */
   .fall-zone{height:640px;--ey:960px}
   .pole-img{height:768px;bottom:0}
-  .banana{padding-bottom:110px}
+  /* 窄屏杆底与区底齐平，不再有桌面端那 240px 出界，底衬随之收窄 */
+  .banana{padding-bottom:48px}
   /* 窄屏：提示文字挪到电视下方居中，箭头收起 */
   .tv-hint{right:auto;left:50%;bottom:-34px;transform:translateX(-50%)}
   .tv-hint-arrow{display:none}
@@ -686,6 +687,8 @@ a{text-decoration:none;color:inherit}
   .login{padding:8px 14px}
   .fall-zone{height:480px;--ey:780px}
   .pole-img{height:576px;bottom:0}
+  /* 手机：手写签名即区块收尾，底衬压到最小，避免卡牌下方留一大片空纸 */
+  .banana{padding-bottom:24px}
   .cm-stage img{max-width:88vw}
   .cm-close{top:14px;right:14px}
   .merch{margin-top:-110px;padding:190px 20px 90px}
