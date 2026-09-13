@@ -1,0 +1,12 @@
+# 统一换行符为 LF，保证本地文件与线上部署逐字节一致
+* text=auto eol=lf
+# 二进制资源不做任何转换
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.webp binary
+*.mp4 binary
+*.ico binary
+*.woff binary
+*.woff2 binary
