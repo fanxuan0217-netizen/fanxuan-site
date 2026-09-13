@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WHITE BOX — 原创卡牌玩法设计 · 樊轩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#ff6622;
+  --black:#000;
+  --white:#ffffff;
+  --green:#3ddc97;
+  --grey:#9b9b9b;
+  --disp:'Anton', 'Arial Narrow', Impact, sans-serif;
+  --body:'Archivo', 'Helvetica Neue', Arial, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit}
+.wrap{width:min(1280px,92%);margin-inline:auto}
+::selection{background:var(--orange);color:#fff}
+
+/* ============ NAV（与主站一致） ============ */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:var(--black);
+  border-bottom:1px solid #161616;
+}
+.nav-in{
+  width:min(1280px,92%);margin-inline:auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:74px;gap:24px;
+}
+.logo{
+  font-family:var(--disp);
+  color:var(--orange);
+  font-size:22px;line-height:.92;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.menu{display:flex;gap:44px}
+.menu a{
+  font-weight:700;
+  font-size:15px;letter-spacing:.08em;
+  color:#cfcfcf;
+  padding:6px 0;
+  transition:color .15s;
+}
+.menu a:hover{color:#fff}
+
+/* ============ HEAD（浅色纸面大字，与天行/神锻页一致） ============ */
+.head{
+  background:#d9d7d2;color:#111;
+  padding:64px 0 72px;
+  position:relative;overflow:hidden;
+}
+.lab-still{
+  font-weight:900;
+  font-size:15px;letter-spacing:.34em;
+  color:#8a8a8a;margin-bottom:18px;
+}
+.head-word{
+  font-weight:900;
+  font-size:clamp(56px,8.5vw,140px);
+  letter-spacing:.02em;line-height:1.02;color:#0d0d0d;
+}
+.head-word em{font-style:normal;color:var(--orange)}
+.head-role{
+  font-weight:700;
+  font-size:clamp(14px,1.3vw,19px);
+  letter-spacing:.3em;color:#1a1a1a;
+  margin-top:12px;
+}
+
+/* ============ INTRO（海报作文字背景） ============ */
+.intro{
+  position:relative;
+  padding:120px 0;
+  background:url('img/whitebox-promo.jpg') no-repeat center center;
+  background-size:cover;
+  background-attachment:fixed;
+}
+.intro::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(8,13,20,.82),rgba(8,13,20,.68) 45%,rgba(8,13,20,.85));
+  backdrop-filter:blur(16px) saturate(.85);
+  -webkit-backdrop-filter:blur(16px) saturate(.85);
+}
+.intro .wrap{position:relative;z-index:1}
+/* 左文右牌双栏 */
+.intro-grid{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:clamp(28px,4vw,56px);
+  align-items:start;
+}
+.chips{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:40px}
+.chip{
+  font-size:12px;font-weight:700;letter-spacing:.14em;
+  color:#e6f0fa;
+  border:1px solid rgba(230,240,250,.35);
+  background:rgba(10,20,32,.5);
+  padding:8px 16px;
+}
+.chip.hot{color:var(--orange);border-color:rgba(255,102,34,.65)}
+.lead-wrap{max-width:640px}
+/* 三卡型拆解清单（行距拉开，底部与右侧对局板齐平） */
+.type-list{margin-top:44px;border-top:1px solid rgba(230,240,250,.22)}
+.type-row{
+  display:flex;gap:16px;align-items:baseline;
+  padding:24px 2px;
+  border-bottom:1px solid rgba(230,240,250,.12);
+}
+.type-tag{
+  flex-shrink:0;width:58px;
+  font-weight:900;font-size:13px;letter-spacing:.12em;
+  color:var(--orange);
+}
+.type-row p{
+  font-size:13.5px;line-height:1.75;
+  color:#c8d4de;letter-spacing:.02em;
+}
+.type-row p strong{color:#fff;font-weight:700}
+.lead-p{
+  font-size:clamp(16px,1.35vw,19px);
+  line-height:2.1;
+  color:#f2f5f8;
+  margin-bottom:24px;
+  letter-spacing:.02em;
+  text-shadow:0 2px 10px rgba(0,0,0,.65);
+}
+.lead-p strong{color:#fff;font-weight:700}
+.lead-p .o{color:var(--orange)}
+.lead-p .g{color:var(--green)}
+
+/* ============ 对局演示（简介区右栏，无标题直接上板） ============ */
+.demo-col{
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+}
+.board{
+  position:relative;
+  aspect-ratio:704/1144;                 /* 与框图同比例，整图不裁不变形 */
+  width:min(400px,100%);
+  margin-inline:auto;
+  border-radius:18px;
+  overflow:hidden;
+  background:url('img/game-board.jpg?v=1') center / 100% 100% no-repeat;
+  box-shadow:0 22px 54px rgba(0,0,0,.55);
+}
+/* 内框可玩区：inset 按 game-board.jpg 实测的深蓝面板百分比钉死，卡牌只落框内 */
+.board-inner{
+  position:absolute;
+  inset:9% 14% 15% 15%;
+  display:flex;flex-direction:column;
+  min-height:0;
+}
+.board-top{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:4px;
+  padding:0 22px;
+}
+.round{
+  font-family:var(--disp);font-size:13px;letter-spacing:.2em;
+  color:#9fb6ca;
+}
+.round b{color:var(--orange)}
+/* BOSS 区 */
+.boss{
+  display:flex;align-items:center;gap:12px;
+  width:100%;margin:2px 0 0;
+}
+.boss img{
+  width:46px;height:46px;object-fit:cover;border-radius:10px;
+  border:2px solid #46586a;flex-shrink:0;
+}
+.boss-info{flex:1;min-width:0}
+.boss-name{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-weight:900;font-size:14px;letter-spacing:.06em;
+  color:#f2f5f8;
+}
+.boss-name .lv{color:#8fa5b5;font-size:12px}
+.hpbar{
+  height:14px;margin-top:6px;
+  background:#1c2733;border:1px solid #0d141c;border-radius:8px;
+  overflow:hidden;position:relative;
+}
+.hpfill{
+  height:100%;width:100%;
+  background:linear-gradient(180deg,#ff7a7a,#d32f2f);
+  border-radius:7px;
+  transition:width .5s cubic-bezier(.3,.8,.3,1);
+}
+.hpnum{font-size:11px;color:#b9c6d2;margin-top:4px;letter-spacing:.08em}
+/* 场地中央：flex:1 吃掉 BOSS 以下全部高度（含手牌区），整块都是出牌区 */
+.stage{
+  position:relative;
+  flex:1;
+  min-height:150px;
+  margin:10px 0 8px;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(closest-side, rgba(255,102,34,.07), transparent 75%);
+}
+/* 打出的卡：绝对居中于整个场地 */
+.play-slot{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.stage-hint{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  padding-bottom:18%;
+  color:#5d7183;font-weight:700;letter-spacing:.28em;font-size:13px;
+  transition:opacity .3s;
+}
+.stage.has-card .stage-hint{opacity:0}
+.stage img.played{
+  width:min(180px,54%);
+  border-radius:12px;
+  border:3px solid rgba(248,246,240,.92);
+  box-shadow:0 30px 70px rgba(0,0,0,.65),0 0 46px rgba(255,102,34,.25);
+  animation:pop .38s cubic-bezier(.2,.9,.3,1.25);
+}
+@keyframes pop{
+  from{transform:scale(.35) rotate(-8deg);opacity:0}
+  to{transform:scale(1) rotate(0deg);opacity:1}
+}
+.win-flash{
+  position:absolute;inset:0;z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(8,12,18,.78);
+  font-family:var(--disp);font-size:clamp(40px,7vw,84px);
+  letter-spacing:.18em;color:var(--orange);
+  opacity:0;pointer-events:none;
+  transition:opacity .25s;
+}
+.win-flash.show{opacity:1}
+/* 手牌：坐在场地最底缘（面板底部蓝线位置），窄卡重叠扇形排布，hover 抬起不变 */
+.hand{
+  position:absolute;left:0;right:0;bottom:-38px;
+  display:flex;justify-content:center;
+  flex-wrap:nowrap;
+}
+.hcard{
+  position:relative;
+  width:29%;                              /* 随板宽缩放，板缩手牌不溢出 */
+  cursor:pointer;
+  transition:transform .28s,opacity .28s,filter .28s;
+  -webkit-tap-highlight-color:transparent;
+}
+.hcard + .hcard{margin-left:-9%}
+.hcard img{
+  width:100%;aspect-ratio:.72;object-fit:cover;display:block;
+  border-radius:10px;
+  border:3px solid rgba(248,246,240,.92);
+  box-shadow:0 14px 30px rgba(0,0,0,.5);
+}
+.hcard .htag{
+  position:absolute;left:50%;bottom:7px;transform:translateX(-50%);
+  background:var(--orange);color:#fff;
+  font-size:10px;font-weight:900;letter-spacing:.08em;
+  padding:2px 10px;border-radius:20px;
+  white-space:nowrap;
+}
+.hcard:nth-child(1){transform:rotate(-5deg) translateY(10px)}
+.hcard:nth-child(2){transform:rotate(-1.5deg) translateY(2px)}
+.hcard:nth-child(3){transform:rotate(1.5deg) translateY(2px)}
+.hcard:nth-child(4){transform:rotate(5deg) translateY(10px)}
+.hcard:hover{transform:rotate(0) translateY(-16px) scale(1.06);z-index:3}
+.hcard.spent{opacity:.15;pointer-events:none;transform:scale(.9)}
+.hand-note{
+  text-align:center;margin-top:10px;
+  color:#7d92a5;font-size:10px;letter-spacing:.12em;font-weight:700;
+}
+
+/* ============ FOOTER ============ */
+.footer{
+  background:#050505;
+  border-top:1px solid #1a1a1a;
+  text-align:center;
+  padding:34px 16px 30px;
+}
+.footer .logo{display:inline-block;font-size:16px;margin-bottom:10px}
+.footer p{font-size:12px;color:#6d6d6d;letter-spacing:.08em;margin-bottom:14px}
+.footer a[class=""]{
+  font-size:12px;font-weight:700;letter-spacing:.14em;
+  color:#9b9b9b;transition:color .15s;
+}
+.footer a[class=""]:hover{color:var(--orange)}
+
+@media (max-width:960px){
+  .intro-grid{grid-template-columns:1fr}
+  .lead-wrap{max-width:860px}
+}
+@media (max-width:860px){
+  .menu{gap:20px}
+  .head{padding:56px 0 52px}
+  .intro{padding:80px 0;background-attachment:scroll}
+  .stage{min-height:240px}
+  .hand{flex-wrap:nowrap}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="logo">WHITE<br>BOX</a>
+    <nav class="menu">
+      <a href="index.html">个人简介</a>
+      <a href="index.html#cards">原创IP</a>
+      <a href="index.html#story">作品展示</a>
+      <a href="contact.html">联系方式</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HEAD -->
+<section class="head">
+  <div class="wrap">
+    <p class="lab-still">作品简介 / Works</p>
+    <h1 class="head-word">WHITE <em>BOX</em></h1>
+    <p class="head-role">原创 IP · 卡牌玩法设计 · 同一个世界观，打同一场牌</p>
+  </div>
+</section>
+
+<!-- INTRO（海报背景 + 左文右牌） -->
+<section class="intro">
+  <div class="wrap">
+    <div class="intro-grid">
+      <div>
+        <div class="chips">
+          <span class="chip hot">原创 IP · 连载中</span>
+          <span class="chip">16 张成品卡面</span>
+          <span class="chip">技能 / 事件 / 角色三种卡型</span>
+          <span class="chip">全手绘</span>
+        </div>
+        <div class="lead-wrap">
+          <p class="lead-p">这套卡想干的事很简单：把「香蕉波特」的世界观搬到牌桌上。16 张卡分三种——<strong class="o">技能卡</strong>是角色吃饭的本事，<strong class="o">事件卡</strong>是这群朋友闯的祸，<strong class="o">角色卡</strong>是他们之间的关系网。</p>
+          <p class="lead-p">牌桌上的对局，就是香蕉波特和朋友们日常互坑的延伸：蕉头烂鹅一个「沉默」把你技能按住，真·倒挂金钩原地翻盘，闪电连拍抢节奏——<strong>打一局牌，就像看他们吵了一架</strong>。规则不绕：手牌打完见分晓；但卡和卡怎么配合、什么时候留后手，才是这套玩法真正想让你琢磨的东西。</p>
+        </div>
+        <div class="type-list">
+          <div class="type-row">
+            <span class="type-tag">技能卡</span>
+            <p>角色吃饭的本事——蕉头烂鹅的<strong>「沉默」</strong>按住你，<strong>真·倒挂金钩</strong>原地翻盘，看家功夫各有各的损。</p>
+          </div>
+          <div class="type-row">
+            <span class="type-tag">事件卡</span>
+            <p>这群朋友闯的祸——<strong>闪电 12345 连拍</strong>抢节奏，<strong>「明天再说吧」</strong>拖人后腿，谁抽到谁头大。</p>
+          </div>
+          <div class="type-row">
+            <span class="type-tag">角色卡</span>
+            <p>他们之间的关系网——<strong>谁和谁一伙、谁看谁不顺眼</strong>，摸清关系才知道什么时候留后手。</p>
+          </div>
+        </div>
+      </div>
+      <div class="demo-col">
+        <div class="board">
+          <div class="board-inner">
+            <div class="board-top">
+              <span class="round">ROUND <b id="roundNo">1</b></span>
+              <span class="round">HAND <b id="handLeft">4</b>/4</span>
+            </div>
+            <div class="boss">
+              <img src="img/boss-avatar.png?v=1" alt="通缉要犯">
+              <div class="boss-info">
+                <div class="boss-name"><span>通缉要犯</span><span class="lv">Lv.9</span></div>
+                <div class="hpbar"><div class="hpfill" id="hpFill"></div></div>
+                <div class="hpnum"><span id="hpNow">88</span>/88</div>
+              </div>
+            </div>
+            <div class="stage" id="stage">
+              <div class="stage-hint">出 牌 区</div>
+              <div class="play-slot" id="playSlot"></div>
+              <div class="hand" id="hand"></div>
+            </div>
+            <p class="hand-note">WHITE BOX · 对局演示 · 非实机游戏</p>
+          </div>
+          <div class="win-flash" id="winFlash">WIN!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <a href="index.html" class="logo">WHITE BOX</a>
+    <p>© 2026 樊轩 · 原创内容，请勿转载</p>
+    <a href="index.html#story">← 返回作品展示</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* 手牌数据：四张真卡面 */
+  var HAND = [
+    { src:'cards/c01.jpg', name:'蕉头烂鹅 · 沉默「明天再说吧」', tag:'技能' },
+    { src:'cards/c07.jpg', name:'香蕉波特 · 技能卡',             tag:'技能' },
+    { src:'cards/c08.jpg', name:'真 · 倒挂金钩',                 tag:'技能发动' },
+    { src:'cards/c11.jpg', name:'闪电 12345 连拍',               tag:'事件' }
+  ];
+  var HP_MAX = 88, HIT = 22;
+
+  var handEl  = document.getElementById('hand');
+  var stageEl = document.getElementById('stage');
+  var slotEl  = document.getElementById('playSlot');
+  var hpFill  = document.getElementById('hpFill');
+  var hpNow   = document.getElementById('hpNow');
+  var roundEl = document.getElementById('roundNo');
+  var leftEl  = document.getElementById('handLeft');
+  var winFl   = document.getElementById('winFlash');
+
+  var hp = HP_MAX, round = 1, spent = 0, dealing = false;
+
+  function renderHand(){
+    handEl.innerHTML = '';
+    HAND.forEach(function(c){
+      var d = document.createElement('div');
+      d.className = 'hcard';
+      var img = document.createElement('img');
+      img.src = c.src; img.alt = c.name;
+      var tg = document.createElement('span');
+      tg.className = 'htag'; tg.textContent = c.tag;
+      d.appendChild(img); d.appendChild(tg);
+      d.addEventListener('click', function(){ play(d, c); });
+      handEl.appendChild(d);
+    });
+    leftEl.textContent = 4 - spent;
+  }
+
+  function play(el, c){
+    if(dealing || el.classList.contains('spent')) return;
+    dealing = true;
+    el.classList.add('spent');
+    spent++;
+    leftEl.textContent = 4 - spent;
+
+    /* 卡牌落到场地正中（含手牌区在内的整个下半场） */
+    stageEl.classList.add('has-card');
+    var old = slotEl.querySelector('img.played');
+    if(old) old.remove();
+    var img = document.createElement('img');
+    img.src = c.src; img.alt = c.name;
+    img.className = 'played';
+    slotEl.appendChild(img);
+
+    /* BOSS 掉血 */
+    hp = Math.max(0, hp - HIT);
+    hpFill.style.width = (hp / HP_MAX * 100) + '%';
+    hpNow.textContent = hp;
+
+    setTimeout(function(){
+      dealing = false;
+      if(spent >= 4){                 /* 四张打完 → 胜利 → 重新开局 */
+        winFl.classList.add('show');
+        setTimeout(function(){
+          winFl.classList.remove('show');
+          hp = HP_MAX;
+          hpFill.style.width = '100%';
+          hpNow.textContent = hp;
+          spent = 0;
+          round++;
+          roundEl.textContent = round;
+          stageEl.classList.remove('has-card');
+          var im = slotEl.querySelector('img.played');
+          if(im) im.remove();
+          renderHand();
+        }, 950);
+      }
+    }, 420);
+  }
+
+  renderHand();
+})();
+</script>
+
+</body>
+</html>

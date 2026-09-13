@@ -1,0 +1,14 @@
+# 内部工作目录：含改版前备份与备案材料（含个人信息），不对外发布
+.backup/
+comic-verse-replica-r2/
+
+# 系统与编辑器杂项
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+
+# 本地临时校验产物
+live-check.html
+live-verify.html

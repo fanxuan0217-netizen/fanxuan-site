@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《数字天堂》— 待合作剧本 · 樊轩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#ff6622;
+  --orange-d:#e4531a;
+  --black:#000;
+  --white:#ffffff;
+  --paper:#f4f1ea;
+  --green:#3ddc97;
+  --red:#ff6363;
+  --grey:#9b9b9b;
+  --disp:'Anton', 'Arial Narrow', Impact, sans-serif;
+  --body:'Archivo', 'Helvetica Neue', Arial, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit}
+.wrap{width:min(1280px,92%);margin-inline:auto}
+::selection{background:var(--orange);color:#fff}
+
+/* ============ NAV（与主站一致） ============ */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:var(--black);
+  border-bottom:1px solid #161616;
+}
+.nav-in{
+  width:min(1280px,92%);margin-inline:auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:74px;gap:24px;
+}
+.logo{
+  font-family:var(--disp);
+  color:var(--orange);
+  font-size:22px;line-height:.92;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.menu{display:flex;gap:44px}
+.menu a{
+  font-weight:700;
+  font-size:15px;letter-spacing:.08em;
+  color:#cfcfcf;
+  padding:6px 0;
+  transition:color .15s;
+}
+.menu a:hover{color:#fff}
+
+/* ============ HEAD（浅色纸面大字） ============ */
+.head{
+  background:#d9d7d2;color:#111;
+  padding:64px 0 72px;
+  position:relative;overflow:hidden;
+}
+.lab-still{
+  font-weight:900;
+  font-size:15px;letter-spacing:.34em;
+  color:#8a8a8a;margin-bottom:18px;
+}
+.head-word{
+  font-weight:900;
+  font-size:clamp(40px,6.4vw,100px);
+  letter-spacing:.02em;line-height:1.08;color:#0d0d0d;
+}
+.head-word em{font-style:normal;color:var(--orange)}
+.head-role{
+  font-weight:700;
+  font-size:clamp(14px,1.3vw,19px);
+  letter-spacing:.3em;color:#1a1a1a;
+  margin-top:12px;
+}
+
+/* ============ INTRO（黑纸正文区） ============ */
+.intro{padding:88px 0 40px}
+.credit{
+  border:1px solid #2c2c2c;border-left:3px solid var(--orange);
+  background:#111;
+  padding:16px 20px;
+  margin-bottom:36px;
+  max-width:860px;
+}
+.credit-title{font-weight:800;font-size:15px;letter-spacing:.04em;color:#f2f2f2}
+.credit-title .sep{color:#5a5a5a;margin:0 8px;font-weight:400}
+.credit-duty{margin-top:8px;font-size:14px;color:#bdbdbd;line-height:1.8}
+.credit-duty b{color:var(--orange);font-weight:900;letter-spacing:.1em;margin-right:8px}
+.chips{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:40px}
+.chip{
+  font-size:12px;font-weight:700;letter-spacing:.14em;
+  color:#cfcfcf;
+  border:1px solid #2c2c2c;
+  padding:8px 16px;
+}
+.chip.hot{color:var(--orange);border-color:rgba(255,102,34,.55)}
+.lead-wrap{max-width:860px}
+.lead-p{
+  font-size:clamp(16px,1.35vw,19px);
+  line-height:2.05;
+  color:#e8e5df;
+  margin-bottom:26px;
+  letter-spacing:.02em;
+}
+.lead-p strong{color:#fff;font-weight:700}
+.lead-p .o{color:var(--orange)}
+.lead-p .g{color:var(--green)}
+
+/* ============ 看点三卡 ============ */
+.points{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:26px;
+  padding:36px 0 110px;
+}
+.pt{
+  background:#101010;
+  border:1px solid #1f1f1f;
+  border-top:4px solid var(--accent,var(--orange));
+  padding:30px 28px;
+  transition:border-color .2s,transform .2s;
+}
+.pt:hover{border-color:var(--accent,var(--orange));transform:translateY(-4px)}
+.pt h3{
+  font-weight:900;font-size:17px;letter-spacing:.06em;
+  color:#fff;margin-bottom:12px;
+}
+.pt p{font-size:14px;line-height:1.95;color:#a9a9a9}
+
+/* ============ FOOTER ============ */
+.footer{
+  border-top:1px solid #161616;
+  padding:34px 0;
+}
+.footer .wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer .logo{font-size:16px}
+.footer p{font-size:12px;color:#6d6d6d;letter-spacing:.1em}
+.footer a{color:#9b9b9b;font-weight:700;transition:color .15s}
+.footer a:hover{color:var(--orange)}
+
+@media (max-width:860px){
+  .points{grid-template-columns:1fr}
+  .menu{gap:20px}
+  .head{padding:44px 0 52px}
+  .intro{padding:60px 0 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="logo">WHITE<br>BOX</a>
+    <nav class="menu">
+      <a href="index.html">个人简介</a>
+      <a href="index.html#cards">原创IP</a>
+      <a href="index.html#story">作品展示</a>
+      <a href="contact.html">联系方式</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HEAD -->
+<section class="head">
+  <div class="wrap">
+    <p class="lab-still">待合作剧本 / For Collaboration</p>
+    <h1 class="head-word">数字<em>天堂</em></h1>
+    <p class="head-role">科幻 · 黑色幽默 · 单元群像</p>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="intro">
+  <div class="wrap">
+    <div class="credit">
+      <p class="credit-title">《数字天堂》<span class="sep">｜</span>待合作剧本</p>
+      <p class="credit-duty"><b>状态</b>原创剧本正在寻找合作方，完整剧本与详细资料可在洽谈后提供。</p>
+    </div>
+    <div class="chips">
+      <span class="chip hot">科幻 · 黑色幽默</span>
+      <span class="chip">单元群像</span>
+      <span class="chip">原创剧本大纲</span>
+    </div>
+    <div class="lead-wrap">
+      <p class="lead-p">2200 年，考古学家从废弃写字楼地下挖出一台古老存储设备——里面是 2020 年诞生的技术「<strong class="o">数字天堂</strong>」的全貌：逝者被数据化存入服务器，生者用 APP 扫墓、送祭品、甚至对话。</p>
+      <p class="lead-p">于是有人生前疯狂攒网络痕迹，有人经营一辈子完美人设只为死后体面，埃及运营商把机房盖进 3D 打印的金字塔……单元式黑色幽默群像，笑完脊背发凉。</p>
+      <p class="lead-p">核心一句话：<strong>我们留下的每一条数据，都是未来的「遗容」</strong>。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 看点三卡 -->
+<section class="points-wrap">
+  <div class="wrap points">
+    <div class="pt" style="--accent:#ff6622">
+      <h3>数字天堂</h3>
+      <p>逝者数据化存入服务器，生者用 APP 扫墓、送祭品、甚至对话——一条被商业化的数字来世产业链。</p>
+    </div>
+    <div class="pt" style="--accent:#3ddc97">
+      <h3>单元式黑色群像</h3>
+      <p>攒网络痕迹的、经营死后体面的、把机房盖进金字塔的运营商——每集一个荒诞切面，笑完脊背发凉。</p>
+    </div>
+    <div class="pt" style="--accent:#ff6363">
+      <h3>数据即遗容</h3>
+      <p>2200 年的考古视角回望今天：我们留下的每一条数据，都是未来的「遗容」——科幻外壳下的当下叩问。</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <a href="index.html" class="logo">WHITE BOX</a>
+    <p>© 2026 樊轩 · 原创内容，请勿转载</p>
+    <a href="index.html#story">← 返回作品展示</a>
+  </div>
+</footer>
+
+</body>
+</html>

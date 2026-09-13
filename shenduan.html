@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《神锻》— 作品简介 · 樊轩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#ff6622;
+  --orange-d:#e4531a;
+  --black:#000;
+  --white:#ffffff;
+  --paper:#f4f1ea;
+  --green:#3ddc97;
+  --red:#ff6363;
+  --grey:#9b9b9b;
+  --disp:'Anton', 'Arial Narrow', Impact, sans-serif;
+  --body:'Archivo', 'Helvetica Neue', Arial, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit}
+.wrap{width:min(1280px,92%);margin-inline:auto}
+::selection{background:var(--orange);color:#fff}
+
+/* ============ NAV（与主站一致） ============ */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:var(--black);
+  border-bottom:1px solid #161616;
+}
+.nav-in{
+  width:min(1280px,92%);margin-inline:auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:74px;gap:24px;
+}
+.logo{
+  font-family:var(--disp);
+  color:var(--orange);
+  font-size:22px;line-height:.92;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.menu{display:flex;gap:44px}
+.menu a{
+  font-weight:700;
+  font-size:15px;letter-spacing:.08em;
+  color:#cfcfcf;
+  padding:6px 0;
+  transition:color .15s;
+}
+.menu a:hover{color:#fff}
+
+/* ============ HEAD（浅色纸面大字） ============ */
+.head{
+  background:#d9d7d2;color:#111;
+  padding:64px 0 72px;
+  position:relative;overflow:hidden;
+}
+.lab-still{
+  font-weight:900;
+  font-size:15px;letter-spacing:.34em;
+  color:#8a8a8a;margin-bottom:18px;
+}
+.head-word{
+  font-weight:900;
+  font-size:clamp(64px,9.5vw,150px);
+  letter-spacing:.02em;line-height:1.02;color:#0d0d0d;
+}
+.head-word em{font-style:normal;color:var(--orange)}
+.head-role{
+  font-weight:700;
+  font-size:clamp(14px,1.3vw,19px);
+  letter-spacing:.3em;color:#1a1a1a;
+  margin-top:12px;
+}
+
+/* ============ INTRO（黑纸正文区） ============ */
+.intro{padding:88px 0 40px}
+/* 职责卡：甲方最关心的「具体做了什么」 */
+.credit{
+  border:1px solid #2c2c2c;border-left:3px solid var(--orange);
+  background:#111;
+  padding:16px 20px;
+  margin-bottom:36px;
+  max-width:860px;
+}
+.credit-title{font-weight:800;font-size:15px;letter-spacing:.04em;color:#f2f2f2}
+.credit-title .sep{color:#5a5a5a;margin:0 8px;font-weight:400}
+.credit-duty{margin-top:8px;font-size:14px;color:#bdbdbd;line-height:1.8}
+.credit-duty b{color:var(--orange);font-weight:900;letter-spacing:.1em;margin-right:8px}
+.chips{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:40px}
+.chip{
+  font-size:12px;font-weight:700;letter-spacing:.14em;
+  color:#cfcfcf;
+  border:1px solid #2c2c2c;
+  padding:8px 16px;
+}
+.chip.hot{color:var(--orange);border-color:rgba(255,102,34,.55)}
+.lead-wrap{max-width:860px}
+.lead-p{
+  font-size:clamp(16px,1.35vw,19px);
+  line-height:2.05;
+  color:#e8e5df;
+  margin-bottom:26px;
+  letter-spacing:.02em;
+}
+.lead-p strong{color:#fff;font-weight:700}
+.lead-p .o{color:var(--orange)}
+.lead-p .g{color:var(--green)}
+
+/* ============ 看点三卡 ============ */
+.points{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:26px;
+  padding:36px 0 110px;
+}
+.pt{
+  background:#101010;
+  border:1px solid #1f1f1f;
+  border-top:4px solid var(--accent,var(--orange));
+  padding:30px 28px;
+  transition:border-color .2s,transform .2s;
+}
+.pt:hover{border-color:var(--accent,var(--orange));transform:translateY(-4px)}
+.pt h3{
+  font-weight:900;font-size:17px;letter-spacing:.06em;
+  color:#fff;margin-bottom:12px;
+}
+.pt p{font-size:14px;line-height:1.95;color:#a9a9a9}
+
+/* ============ FOOTER ============ */
+.footer{
+  border-top:1px solid #161616;
+  padding:34px 0;
+}
+.footer .wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer .logo{font-size:16px}
+.footer p{font-size:12px;color:#6d6d6d;letter-spacing:.1em}
+.footer a{color:#9b9b9b;font-weight:700;transition:color .15s}
+.footer a:hover{color:var(--orange)}
+
+@media (max-width:860px){
+  .points{grid-template-columns:1fr}
+  .menu{gap:20px}
+  .head{padding:44px 0 52px}
+  .intro{padding:60px 0 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="logo">WHITE<br>BOX</a>
+    <nav class="menu">
+      <a href="index.html">个人简介</a>
+      <a href="index.html#cards">原创IP</a>
+      <a href="index.html#story">作品展示</a>
+      <a href="contact.html">联系方式</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HEAD -->
+<section class="head">
+  <div class="wrap">
+    <p class="lab-still">作品简介 / Works</p>
+    <h1 class="head-word">神<em>锻</em></h1>
+    <p class="head-role">东方奇幻 · 神器止战 · 想要和平，就要有随时开战的底气</p>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="intro">
+  <div class="wrap">
+    <div class="credit">
+      <p class="credit-title">《神锻》<span class="sep">｜</span>动画剧本 · 番外</p>
+      <p class="credit-duty"><b>职责</b>番外单元剧本撰写，世界观补全。</p>
+    </div>
+    <div class="chips">
+      <span class="chip hot">动画剧本大纲</span>
+      <span class="chip">东方奇幻 · 战斗</span>
+      <span class="chip">「魔刀千刃」起源故事</span>
+    </div>
+    <div class="lead-wrap">
+      <p class="lead-p">《神锻》是一部东方奇幻题材的动画剧本，故事发生在以锻造神兵闻名的<strong>神锻国</strong>：武匠一夜之间神秘消失，一纸禁武令让这个国家空有锻造之术、再无神兵问世——表面和平，实则软弱可欺。</p>
+      <p class="lead-p">怀揣武侠梦的<strong class="o">小铁匠</strong>不愿认命，暗中习武，并在矿洞里救下一只小妖兽，共同锻出神兵「<strong class="o">魔刀千刃</strong>」。彼时妖族迁徙途经国境，<strong>玄武国</strong>在暗处挑拨离间，大战一触即发；误解与献祭把小铁匠推向风口浪尖，也让她与妖族主和派并肩作战，以魔刀千刃封印主战派勇士，止住了一场战争。</p>
+      <p class="lead-p">神锻国重拾武者精神，以实力赢得真正的和平；魔刀千刃成为国宝，勇士的善念化作<span class="g">千念恶灵</span>，世代守护神兵。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 看点三卡 -->
+<section class="points-wrap">
+  <div class="wrap points">
+    <div class="pt" style="--accent:#ff6622">
+      <h3>神器止战</h3>
+      <p>核心立意：「想要和平，就要有随时开战的底气」。神锻国因失去武者而软弱，又因一把神兵赢得尊重——和平从来不是求来的。</p>
+    </div>
+    <div class="pt" style="--accent:#3ddc97">
+      <h3>魔刀千刃的来历</h3>
+      <p>补全神兵两大设定——千年恶灵看守、吸收使用者的能力。封印的勇士善念化作千念恶灵，善恶分离的哲学藏在刀里。</p>
+    </div>
+    <div class="pt" style="--accent:#ff6363">
+      <h3>接驳主世界观</h3>
+      <p>斯特国掳走武匠的秘闻为续集埋下伏笔；带走神器的少年成为玄武国首席刺客——观众透过武器，看见更深的「伍六七」宇宙。</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <a href="index.html" class="logo">WHITE BOX</a>
+    <p>© 2026 樊轩 · 原创内容，请勿转载</p>
+    <a href="index.html#story">← 返回作品展示</a>
+  </div>
+</footer>
+
+</body>
+</html>
