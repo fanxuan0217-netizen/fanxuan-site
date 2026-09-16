@@ -654,7 +654,20 @@ a{text-decoration:none;color:inherit}
   text-align:center;
   padding:22px 16px;
 }
-.foot p{font-size:12px;color:#6d6d6d;letter-spacing:.08em}
+.foot p{font-size:12px;color:#6d6d6d;letter-spacing:.08em;word-break:keep-all}
+/* 页脚 · 今日来访：数字用橙色点亮，等宽数字避免跳动 */
+.foot-visit{white-space:nowrap}
+.foot-visit b{
+  display:inline-block;
+  font-family:var(--body);font-weight:900;
+  font-size:15px;line-height:1;
+  color:var(--orange);
+  font-variant-numeric:tabular-nums;
+  margin-left:4px;
+}
+.foot-visit b.pop{animation:visit-pop .55s cubic-bezier(.34,1.56,.64,1)}
+@keyframes visit-pop{0%{transform:scale(1)}45%{transform:scale(1.4)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.foot-visit b.pop{animation:none}}
 
 /* ============ RESPONSIVE ============ */
 @media (max-width:960px){
@@ -898,7 +911,10 @@ a{text-decoration:none;color:inherit}
 </section>
 
 <footer class="foot">
-  <p>© 2026 樊轩 · WHITE BOX 原创卡牌与「香蕉波特」IP · 北京　|　fanxuanlll@126.com</p>
+  <p>© 2026 樊轩 · WHITE BOX 原创卡牌与「香蕉波特」IP · 北京　|　fanxuanlll@126.com
+
+    <span class="foot-visit" title="今日打开本站的设备数（北京时间 0 点归零）">　|　今日来访 <b id="visitNum" aria-live="polite">—</b></span>
+  </p>
 </footer>
 
 <!-- ================= CARD MODAL ================= -->
@@ -1435,6 +1451,58 @@ a{text-decoration:none;color:inherit}
     apply();
     requestAnimationFrame(tick);
   });
+})();
+
+/* —— 页脚「今日来访」 ——
+   纯静态站没有后端，计数器借用公开的免费计数服务 Abacus（无账号、支持跨域直连）。
+   三处设计：
+   1) key 带日期（day-YYYYMMDD，按北京时间算）→ 过了零点自动换 key，从 1 重新数，
+      即「每天重置」，不需要任何人工干预。
+   2) 同一台设备当天只 +1（localStorage 打标）：第一次打开才 hit，之后只 get。
+      所以这个数字≈今天有多少台设备打开过，而不是被刷新了多少次。
+   3) 服务不通就保持「—」，不显示 0——免得看着像没人来过，误判。 */
+(function(){
+  var el = document.getElementById('visitNum');
+  if(!el) return;
+
+  var NS  = 'fanxuan.online';                       /* 命名空间，用站点域名防撞 */
+  var API = 'https://abacus.jasoncameron.dev';
+
+  /* 北京时间日期串：8 小时偏移后再取 UTC 日期段 */
+  function bjDay(){
+    var d = new Date(Date.now() + 8 * 3600 * 1000);
+    return d.toISOString().slice(0,10).replace(/-/g,'');
+  }
+
+  var day  = bjDay();
+  var flag = 'fx-visit-' + day;
+  var seen = false;
+  try { seen = !!localStorage.getItem(flag); } catch(e){ seen = false; }
+
+  var url = API + (seen ? '/get/' : '/hit/') + NS + '/day-' + day;
+
+  /* 服务卡住 6 秒就放弃，免得数字一直吊着 */
+  var ctl = ('AbortController' in window) ? new AbortController() : null;
+  var timer = ctl ? setTimeout(function(){ ctl.abort(); }, 6000) : null;
+  function stop(){ if(timer) clearTimeout(timer); }
+
+  fetch(url, {cache:'no-store', signal: ctl ? ctl.signal : undefined})
+    .then(function(r){
+      if(!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    })
+    .then(function(d){
+      stop();
+      if(!d || typeof d.value !== 'number') throw new Error('bad payload');
+      el.textContent = d.value;
+      el.classList.add('pop');
+      if(!seen){ try { localStorage.setItem(flag, '1'); } catch(e){} }
+    })
+    .catch(function(){
+      stop();
+      /* 拿不到就老实留白，不编数字 */
+      el.textContent = '—';
+    });
 })();
 </script>
 
