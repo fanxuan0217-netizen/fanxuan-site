@@ -311,6 +311,12 @@ a{text-decoration:none;color:inherit}
   .stage{min-height:240px}
   .hand{flex-wrap:nowrap}
 }
+/* 减动效兜底：系统开了「减少动态效果」时，入场动画关掉、过渡压到最短
+   纯装饰用途——出牌时序由脚本 setTimeout 驱动，不受此影响 */
+@media (prefers-reduced-motion:reduce){
+  .stage img.played{animation:none}
+  .hpfill,.stage-hint,.win-flash,.hcard{transition-duration:.01ms}
+}
 </style>
 </head>
 <body>
