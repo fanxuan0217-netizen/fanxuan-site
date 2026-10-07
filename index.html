@@ -328,6 +328,11 @@ a{text-decoration:none;color:inherit}
   width:clamp(320px,42vw,540px);
   margin:64px auto 0;
   user-select:none;
+  /* 音量滑槽尺寸参数：外筒宽 / 与机身间距 / 刻度尺宽 / 滑块长边 */
+  --volw:30px;
+  --volgap:20px;
+  --volsc:22px;
+  --volknob:26px;
 }
 .tv-frame{display:block;width:100%;height:auto}
 /* 屏幕黑区按素材像素实测：横向约4.7%~95%、纵向8%~75.4%，向内收一点防压边 */
@@ -360,6 +365,22 @@ a{text-decoration:none;color:inherit}
 }
 .tv-static.zap{animation:tv-zap .24s linear}
 @keyframes tv-zap{0%{opacity:.95}60%{opacity:.55}100%{opacity:0}}
+/* 「点击开启声音」：浏览器拦下带声音的自动播放时浮出，用户一交互即消失。
+   不做这块的话，访客只会觉得"这站坏了没声音"。 */
+.tv-sound{
+  position:absolute;left:50%;bottom:9%;transform:translateX(-50%);
+  z-index:4;display:flex;align-items:center;gap:7px;
+  padding:8px 15px;border:0;border-radius:999px;cursor:pointer;
+  background:rgba(12,12,12,.86);color:#ffb47a;
+  font-family:var(--body);font-weight:900;font-size:13px;letter-spacing:.04em;
+  box-shadow:0 8px 22px rgba(0,0,0,.62),inset 0 0 0 1.5px rgba(255,102,34,.5);
+  animation:tv-sound-pulse 2.4s ease-in-out infinite;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap;
+}
+.tv-sound[hidden]{display:none}
+.tv-sound svg{width:16px;height:16px;flex-shrink:0}
+.tv-sound:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+@keyframes tv-sound-pulse{0%,100%{opacity:.84}50%{opacity:1}}
 /* “点击换台”提示 + 手绘感箭头，指向左下角旋钮 */
 .tv-hint{
   position:absolute;right:calc(100% + 14px);bottom:7%;
@@ -372,6 +393,82 @@ a{text-decoration:none;color:inherit}
   color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6);
 }
 .tv-hint-arrow{width:72px;height:auto;color:var(--orange);flex-shrink:0}
+
+/* —— 机身右侧音量滑槽：复古塑料件（外筒 + 内凹槽 + 圆柱滑块 + 刻度尺）
+   滑块与橙色电平条按 --p（0~1）同步走位；无声音时电平条转灰 —— */
+.vol{
+  position:absolute;
+  left:calc(100% + var(--volgap));
+  top:48%;height:34%;
+  display:flex;align-items:stretch;gap:7px;
+  z-index:3;
+  --p:.3;                            /* 默认音量偏低 */
+  touch-action:none;
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+}
+.vol::before{content:"";position:absolute;inset:-12px -10px}   /* 扩大触控热区 */
+.vol:focus-visible{outline:2px solid var(--orange);outline-offset:8px;border-radius:8px}
+/* 刻度尺：长短交替的横刻线，靠槽一侧对齐 */
+.vol-scale{
+  flex:0 0 var(--volsc);
+  background-image:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.30) 0 1.5px,transparent 1.5px 9px),
+    repeating-linear-gradient(180deg,rgba(255,255,255,.54) 0 2px,transparent 2px 45px);
+  background-size:62% 100%,100% 100%;
+  background-position:right center,right center;
+  background-repeat:no-repeat,no-repeat;
+}
+/* 外筒：拟物圆柱，米白塑料 + 左右高光 + 两端收口暗影 */
+.vol-body{
+  position:relative;
+  flex:0 0 var(--volw);
+  border-radius:999px;
+  background:linear-gradient(90deg,#8b877f 0%,#c9c5bc 11%,#f2efe8 32%,#fffefa 46%,#e2ded5 61%,#b3afa6 82%,#817d75 100%);
+  box-shadow:0 10px 24px rgba(0,0,0,.6),0 2px 4px rgba(0,0,0,.5),
+             inset 0 1px 0 rgba(255,255,255,.55),
+             inset 0 7px 9px -7px rgba(0,0,0,.5),inset 0 -7px 9px -7px rgba(0,0,0,.5);
+}
+/* 内凹深槽 */
+.vol-track{
+  position:absolute;left:50%;transform:translateX(-50%);
+  top:calc(var(--volknob) / 2 - 4px);bottom:calc(var(--volknob) / 2 - 4px);
+  width:9px;border-radius:999px;overflow:hidden;background:#111110;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.95),inset 0 -1px 1px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.32);
+}
+/* 电平条：已调到的音量，橙光；静音/未出声时转灰 */
+.vol-fill{
+  position:absolute;left:0;right:0;bottom:0;
+  height:calc(var(--p,0) * 100%);
+  background:linear-gradient(180deg,#ff9a5e,#ff6622);
+  box-shadow:0 0 9px rgba(255,102,34,.8);
+  transition:height .16s linear,background .25s,box-shadow .25s;
+}
+.vol.mute .vol-fill{
+  background:linear-gradient(180deg,#8a8a86,#5d5d5a);
+  box-shadow:none;
+}
+/* 圆柱滑块：横向高光模拟塑料滚轮 + 中缝滚花 */
+.vol-knob{
+  position:absolute;left:50%;transform:translateX(-50%);
+  bottom:calc(var(--p,0) * (100% - var(--volknob)));
+  width:calc(100% - 3px);height:var(--volknob);
+  border-radius:9px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.12) 17%,rgba(0,0,0,.03) 47%,rgba(0,0,0,.1) 53%,rgba(255,255,255,.42) 78%,rgba(0,0,0,.26)),
+    linear-gradient(90deg,#8d8981 0%,#cecac1 13%,#f7f4ed 37%,#fffefa 49%,#dbd7ce 67%,#a5a198 100%);
+  box-shadow:0 4px 11px rgba(0,0,0,.62),0 1px 0 rgba(255,255,255,.45),inset 0 -1px 1px rgba(0,0,0,.18);
+  transition:bottom .16s linear;
+}
+.vol-knob::after{
+  content:"";position:absolute;left:12%;right:12%;top:50%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,0,0,.36),transparent);
+}
+.vol:hover .vol-knob{filter:brightness(1.05)}
+.vol.drag .vol-knob,.vol.drag .vol-fill{transition:none}   /* 拖动时零延迟跟手 */
+@media (prefers-reduced-motion:reduce){
+  .vol-knob,.vol-fill{transition:none}
+}
 
 /* ============ BANANA (原创IP · falling card rain) ============ */
 .banana{
@@ -667,7 +764,7 @@ a{text-decoration:none;color:inherit}
 }
 .foot-visit b.pop{animation:visit-pop .55s cubic-bezier(.34,1.56,.64,1)}
 @keyframes visit-pop{0%{transform:scale(1)}45%{transform:scale(1.4)}100%{transform:scale(1)}}
-@media (prefers-reduced-motion:reduce){.foot-visit b.pop{animation:none}}
+@media (prefers-reduced-motion:reduce){.foot-visit b.pop{animation:none}.tv-sound{animation:none;opacity:1}}
 
 /* ============ RESPONSIVE ============ */
 @media (max-width:960px){
@@ -692,6 +789,9 @@ a{text-decoration:none;color:inherit}
   /* 窄屏：提示文字挪到电视下方居中，箭头收起 */
   .tv-hint{right:auto;left:50%;bottom:-34px;transform:translateX(-50%)}
   .tv-hint-arrow{display:none}
+  /* 窄屏：滑槽整体收细、加高一点，保证有足够的拖动行程 */
+  .tv{--volw:26px;--volgap:16px;--volsc:18px;--volknob:22px}
+  .vol{height:37%;gap:6px}
   /* 作品双列在窄屏折叠为单列 */
   .w-cols{grid-template-columns:1fr;gap:44px}
 }
@@ -704,7 +804,50 @@ a{text-decoration:none;color:inherit}
   .banana{padding-bottom:24px}
   .cm-stage img{max-width:88vw}
   .cm-close{top:14px;right:14px}
-  .merch{margin-top:-110px;padding:190px 20px 90px}
+  .merch{margin-top:-110px;padding:190px 20px 150px}   /* 底部多留一段，横置滑槽不压到下一区块 */
+  /* 手机：滑槽横置到机身正下方居中 —— 拇指够得着，也不挤压电视宽度 */
+  .tv{--volknob:26px}
+  .vol{
+    left:50%;top:calc(100% + 56px);
+    width:min(76%,300px);height:auto;
+    transform:translateX(-50%);
+    flex-direction:column;gap:9px;
+  }
+  .vol::before{inset:-14px -10px}
+  .vol-scale{
+    flex:none;width:100%;height:10px;
+    background-image:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.30) 0 1.5px,transparent 1.5px 9px),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.54) 0 2px,transparent 2px 45px);
+    background-size:100% 62%,100% 100%;
+    background-position:center bottom,center bottom;
+  }
+  .vol-body{
+    flex:none;width:100%;height:var(--volw);
+    background:linear-gradient(180deg,#8b877f 0%,#c9c5bc 11%,#f2efe8 32%,#fffefa 46%,#e2ded5 61%,#b3afa6 82%,#817d75 100%);
+    box-shadow:0 10px 24px rgba(0,0,0,.6),0 2px 4px rgba(0,0,0,.5),
+               inset 0 1px 0 rgba(255,255,255,.55),
+               inset 7px 0 9px -7px rgba(0,0,0,.5),inset -7px 0 9px -7px rgba(0,0,0,.5);
+  }
+  .vol-track{
+    left:calc(var(--volknob) / 2 - 4px);right:calc(var(--volknob) / 2 - 4px);
+    top:50%;bottom:auto;width:auto;height:9px;
+    transform:translateY(-50%);
+  }
+  .vol-fill{
+    left:0;right:auto;top:0;bottom:0;width:calc(var(--p,0) * 100%);height:auto;
+    background:linear-gradient(90deg,#ff9a5e,#ff6622);
+  }
+  .vol.mute .vol-fill{background:linear-gradient(90deg,#8a8a86,#5d5d5a)}
+  .vol-knob{
+    left:calc(var(--p,0) * (100% - var(--volknob)));
+    top:50%;bottom:auto;transform:translateY(-50%);
+    width:var(--volknob);height:calc(100% - 5px);
+  }
+  .vol-knob::after{
+    left:50%;right:auto;top:14%;bottom:14%;width:1px;height:auto;
+    background:linear-gradient(180deg,transparent,rgba(0,0,0,.36),transparent);
+  }
   .lab-word{font-size:24vw}
   .w-row{flex-wrap:wrap;gap:12px}
   .w-no{width:auto}
@@ -779,10 +922,21 @@ a{text-decoration:none;color:inherit}
   <div class="tv">
     <img class="tv-frame" src="img/tv.jpg" alt="老式电视机">
     <div class="tv-screen" id="tvScreen">
-      <video src="videos/reel-1.mp4" muted playsinline preload="metadata"></video>
-      <video src="videos/reel-2.mp4" muted playsinline preload="metadata"></video>
-      <video src="videos/reel-3.mp4" muted playsinline preload="metadata"></video>
+      <!-- 三个台各一条视频，画面与声音都在文件里自带。
+           换片 = 换 src 里的文件名（或直接覆盖 videos/ 下的同名文件）。
+           音量由机身右侧的滑槽控制。 -->
+      <video src="videos/reel-1.mp4" playsinline preload="metadata"></video>
+      <video src="videos/reel-2.mp4" playsinline preload="metadata"></video>
+      <video src="videos/reel-3.mp4" playsinline preload="metadata"></video>
       <div class="tv-static" id="tvStatic" aria-hidden="true"></div>
+      <button class="tv-sound" id="tvSound" type="button" aria-label="开启电视声音" hidden>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 9.4h3.3L12 5.5v13L7.3 14.6H4z" fill="currentColor"/>
+          <path d="M15.9 8.7c1.3 1 1.3 5.6 0 6.6M18.5 6.3c2.4 2 2.4 9.4 0 11.4"
+                stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+        </svg>
+        <span>点击开启声音</span>
+      </button>
     </div>
     <div class="tv-hint" aria-hidden="true">
       <span class="tv-hint-txt">点击换台</span>
@@ -792,6 +946,17 @@ a{text-decoration:none;color:inherit}
       </svg>
     </div>
     <button class="tv-dial" id="tvDial" aria-label="换台"></button>
+
+    <!-- 音量滑槽：外筒（刻度尺）＋内凹槽（橙色电平条）＋圆柱滑块 -->
+    <div class="vol" id="tvVol" role="slider" tabindex="0"
+         aria-label="电视音量" aria-orientation="vertical"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="45">
+      <span class="vol-scale" aria-hidden="true"></span>
+      <span class="vol-body">
+        <span class="vol-track"><span class="vol-fill" id="tvVolFill"></span></span>
+        <span class="vol-knob" id="tvVolKnob"></span>
+      </span>
+    </div>
   </div>
 </section>
 
@@ -1065,28 +1230,264 @@ a{text-decoration:none;color:inherit}
 })();
 
 /* 电视机：屏内三条动画视频轮播，播完自动切下一条；
-   点面板左下角旋钮（#tvDial）手动"换台"，切台闪一帧雪花噪声 */
+   点面板左下角旋钮（#tvDial）手动"换台"，切台闪一帧雪花噪声；
+   机身右侧滑槽（#tvVol）调音量 —— 默认带声音、音量偏低。
+
+   自动播放策略：浏览器会拦下"带声音的自动播放"，此时先静音起播，
+   待用户第一次交互（点击/触摸/按键/拖滑槽）自动恢复声音。
+   移动端若浏览器不允许直接写 video.volume（如 iOS），自动改用
+   Web Audio 增益控制，保证滑槽在手机上也能真的调音量。 */
 (function(){
   var vids = document.querySelectorAll('#tvScreen video');
   if(!vids.length) return;
   var staticEl = document.getElementById('tvStatic');
+  var volEl = document.getElementById('tvVol');
   var cur = 0;
-  function show(n){
-    cur = n;
-    vids.forEach(function(v,k){
-      if(k===n){
-        v.classList.add('on');
-        try{ v.currentTime = 0; }catch(err){}
-        var p = v.play(); if(p && p.catch) p.catch(function(){});
-      }else{
-        v.classList.remove('on');
-        v.pause();
+
+  /* ---------- 音量状态 ---------- */
+  var DEF_VOL = 0.45;                      /* 默认音量：偏低但不至于听不见 */
+  var KEY = 'fx-tv-vol2';                  /* 换 key：新默认值对所有访客立即生效 */
+  var vol = DEF_VOL;
+  try{
+    var saved = localStorage.getItem(KEY);
+    if(saved !== null && saved !== ''){
+      var n = parseFloat(saved);
+      if(!isNaN(n) && n >= 0 && n <= 1) vol = n;
+    }
+  }catch(err){}
+  var unlocked = true;                     /* 先乐观当作可发声，被策略拦下再退回 */
+  var gainMode = false;                    /* true = 走 Web Audio 增益 */
+  var tvCtx = null;
+  var soundHint = document.getElementById('tvSound');
+
+  /* ---------- 电视声 ----------
+     三个台各一条视频，画面和声音都在同一个文件里，滑槽直接控制视频自身的音量。
+     想换片：覆盖 videos/ 下的同名文件，或改 HTML 里 video 的 src。 */
+
+  function applyVolume(){
+    var silent = (!unlocked) || vol <= 0.001;
+    for(var i=0;i<vids.length;i++){
+      var v = vids[i];
+      v.muted = silent;
+      if(v._gain){ v._gain.gain.value = vol; }
+      else{ try{ v.volume = vol; }catch(err){} }
+    }
+  }
+
+  function paintVol(){
+    if(!volEl) return;
+    var pct = Math.round(vol * 100);
+    volEl.style.setProperty('--p', vol.toFixed(4));
+    volEl.setAttribute('aria-valuenow', pct);
+    volEl.setAttribute('aria-valuetext', pct + '%');
+    volEl.classList.toggle('mute', vol <= 0.001 || !unlocked);
+  }
+
+  /* 能直接写 video.volume 就用原生（桌面全平台）；
+     不能（iOS 等把 volume 设为只读）则改用 Web Audio 增益 */
+  function initVolumeRoute(){
+    var probe = vids[0], canSet = false;
+    try{
+      probe.volume = 0.42;
+      canSet = Math.abs(probe.volume - 0.42) < 0.03;
+      probe.volume = 1;
+    }catch(err){ canSet = false; }
+    if(canSet) return;
+
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    try{
+      var ctx = new AC();
+      for(var i=0;i<vids.length;i++){
+        var g = ctx.createGain();
+        g.gain.value = vol;
+        ctx.createMediaElementSource(vids[i]).connect(g);
+        g.connect(ctx.destination);
+        vids[i]._gain = g;
+      }
+      tvCtx = ctx;
+      gainMode = true;
+    }catch(err){ gainMode = false; }
+  }
+
+  /* 视频自带声音，起停完全跟随视频本身：
+     换台、滚出视口、被浏览器拦下，都由 playOne / pauseOthers / 视口监听统一处理，
+     不再需要单独控制音轨。 */
+
+  function revealSoundHint(on){
+    if(soundHint) soundHint.hidden = !on;
+  }
+  if(soundHint){
+    /* 提示本身就是一次用户手势，点它直接解锁 */
+    soundHint.addEventListener('click', function(e){ e.stopPropagation(); unlock(); });
+  }
+
+  /* 首次用户交互：恢复声音 */
+  function unlock(){
+    if(unlocked) return;
+    unlocked = true;
+    if(gainMode && tvCtx && tvCtx.state === 'suspended'){
+      var r = tvCtx.resume(); if(r && r.catch) r.catch(function(){});
+    }
+    applyVolume();
+    var v = vids[cur];
+    if(inView && v && v.paused){ playOne(v); }
+    paintVol();
+    revealSoundHint(false);
+  }
+  /* 解锁监听：把「滚动 / 滚轮」也算作交互 —— 访客多半是用滚轮翻到电视机前的，
+     只盯着点击的话，他不点就永远听不到声音。
+     滚动未必被浏览器认定为"用户激活"，所以真正出声失败时会重新挂回来，直到一次点击。 */
+  var armed = false;
+  function armUnlock(){
+    if(armed) return;
+    armed = true;
+    var evs = ['pointerdown','touchstart','touchend','keydown','click','wheel','scroll'];
+    function fire(){
+      armed = false;
+      for(var i=0;i<evs.length;i++){
+        window.removeEventListener(evs[i], fire, true);
+      }
+      unlock();
+    }
+    for(var i=0;i<evs.length;i++){
+      window.addEventListener(evs[i], fire, { capture:true, passive:true });
+    }
+  }
+
+  var inView = true;                       /* 电视是否在视口内：不在就不出声、不空放 */
+
+  /* 只有当前台能出声：起播前先把其它台全停掉并归零。
+     否则换台或首播降级时容易出现两台同时播放，声音叠在一起。 */
+  function pauseOthers(keep){
+    for(var i=0;i<vids.length;i++){
+      var v = vids[i];
+      if(v === keep) continue;
+      if(!v.paused) v.pause();
+      if(v.currentTime > 0){ try{ v.currentTime = 0; }catch(err){} }
+    }
+  }
+
+  /* 起播当前台。带声音被浏览器拦下时统一降级：
+     先静音把画面播起来，再亮出「点击开启声音」，等一次真正的手势。
+     ⚠️ play() 失败的回调里必须用「当场传进来的元素」——
+     它若是循环变量，回调执行时早已指向别的元素（var 只有函数作用域）。 */
+  function playOne(v){
+    if(!v) return;
+    pauseOthers(v);
+    applyVolume();
+    var p = v.play();
+    if(!p || !p.catch) return;
+    p.catch(function(err){
+      if(!(err && err.name === 'NotAllowedError')) return;   /* 其它失败原因不当成"被策略拦截" */
+      if(unlocked){
+        unlocked = false;
+        applyVolume();
+        paintVol();
+        revealSoundHint(true);
+        armUnlock();
+      }
+      var c = vids[cur];
+      if(c && c.paused){
+        var q = c.play();                    /* 静音起播：先让画面动起来 */
+        if(q && q.catch) q.catch(function(){});
       }
     });
   }
+
+  function show(n){
+    cur = n;
+    for(var i=0;i<vids.length;i++){
+      var v = vids[i];
+      if(i === n){
+        v.classList.add('on');
+        try{ v.currentTime = 0; }catch(err){}
+      }else{
+        v.classList.remove('on');
+        v.pause();
+        try{ v.currentTime = 0; }catch(err){}
+      }
+    }
+    var c = vids[cur];
+    if(!c) return;
+    if(!inView){ c.pause(); return; }      /* 不在视口：停在首帧，滚回来再播 */
+    playOne(c);
+  }
+
+  /* ---------- 滑槽：拖动 / 点按 / 键盘 ---------- */
+  if(volEl){
+    var trackEl = volEl.querySelector('.vol-track');
+    var dragging = false;
+
+    function volAt(e){
+      var r = (trackEl || volEl).getBoundingClientRect();
+      if(!r.height || !r.width) return vol;
+      var vertical = r.height >= r.width;     /* 竖置 / 横置自适应 */
+      var p = vertical ? (r.bottom - e.clientY) / r.height
+                       : (e.clientX - r.left) / r.width;
+      return Math.max(0, Math.min(1, p));
+    }
+    function commit(v, fromUser){
+      vol = Math.max(0, Math.min(1, v));
+      if(fromUser && !unlocked) unlock();     /* 拖滑槽本身就是用户手势 */
+      applyVolume();
+      paintVol();
+      try{ localStorage.setItem(KEY, String(Math.round(vol * 1000) / 1000)); }catch(err){}
+    }
+    volEl.addEventListener('pointerdown', function(e){
+      dragging = true;
+      try{ volEl.setPointerCapture(e.pointerId); }catch(err){}
+      volEl.classList.add('drag');
+      commit(volAt(e), true);
+      /* 不做 focus()：避免指针操作后残留键盘焦点轮廓；键盘用户仍可 Tab 聚焦 */
+      if(e.cancelable) e.preventDefault();
+    });
+    volEl.addEventListener('pointermove', function(e){
+      if(dragging) commit(volAt(e), true);
+    });
+    function endDrag(e){
+      if(!dragging) return;
+      dragging = false;
+      volEl.classList.remove('drag');
+      try{ volEl.releasePointerCapture(e.pointerId); }catch(err){}
+    }
+    volEl.addEventListener('pointerup', endDrag);
+    volEl.addEventListener('pointercancel', endDrag);
+    volEl.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 0.1 : 0.05, k = e.key, hit = true;
+      if(k === 'ArrowUp' || k === 'ArrowRight') commit(vol + step, true);
+      else if(k === 'ArrowDown' || k === 'ArrowLeft') commit(vol - step, true);
+      else if(k === 'PageUp') commit(vol + 0.2, true);
+      else if(k === 'PageDown') commit(vol - 0.2, true);
+      else if(k === 'Home') commit(0, true);
+      else if(k === 'End') commit(1, true);
+      else hit = false;
+      if(hit) e.preventDefault();
+    });
+  }
+
+  /* ---------- 起播 ---------- */
+  /* 电视滚进视口才播（人还在看首屏时不该先听到声音），滚出去即暂停 */
+  var tvEl = document.querySelector('.tv');
+  if(tvEl && 'IntersectionObserver' in window){
+    new IntersectionObserver(function(es){
+      inView = !!es[0].isIntersecting;
+      var v = vids[cur];
+      if(!v) return;
+      if(inView){
+        if(v.paused) playOne(v);
+      }else{
+        v.pause();
+      }
+    }, { threshold:.2 }).observe(tvEl);
+  }
+
   vids.forEach(function(v,k){
     v.addEventListener('ended', function(){ show((k+1) % vids.length); });
   });
+  initVolumeRoute();
+  applyVolume();
+  paintVol();
   show(0);
 
   /* 手动换台 */
@@ -1294,7 +1695,7 @@ a{text-decoration:none;color:inherit}
   if(isMobile) return;
 
   /* 全局目标选择器：可点元素 + 大字文本 */
-  var SEL = 'a,button,.fcard,.w-row,.pc,.stmt p,.b-title,.lab-arrow,.lab-block,.tv-dial';
+  var SEL = 'a,button,.fcard,.w-row,.pc,.stmt p,.b-title,.lab-arrow,.lab-block,.tv-dial,.vol';
 
   var wrapper = document.createElement('div');
   wrapper.className = 'target-cursor-wrapper';
